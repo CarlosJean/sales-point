@@ -8,7 +8,7 @@ final class ItemDto
     private $name;
     private $quantity;
 
-    public function __construct($id, $name, $quantity)
+    public function __construct($id, $name, $quantity, private ?float $tax = null )
     {
         $this->id = $id;
         $this->name = $name;
@@ -28,5 +28,9 @@ final class ItemDto
     public function quantity()
     {
         return $this->quantity;
+    }
+
+    public function tax(){
+        return $this->tax;
     }
 }

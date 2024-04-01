@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('description');
             $table->float('quantity');
             $table->decimal('price');
+            $table->foreignId('tax_id')
+                ->constrained('taxes');
         });
     }
 
