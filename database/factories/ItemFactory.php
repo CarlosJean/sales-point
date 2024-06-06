@@ -18,7 +18,7 @@ class ItemFactory extends Factory
     {
         return [
             'description' => $this->faker->word(),
-            'quantity' => $this->faker->randomNumber(6),
+            //'quantity' => $this->faker->randomNumber(6),
             'price' => $this->faker->randomFloat(2,1,100000),
             'tax_id' => $this->faker->numberBetween(1,2),
         ];
