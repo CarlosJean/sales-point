@@ -16,10 +16,10 @@ return new class extends Migration
             $table->timestamps();
 
             $table->string('description');
-            $table->float('quantity');
             $table->decimal('price');
-            $table->foreignId('tax_id')
-                ->constrained('taxes');
+            $table->unsignedBigInteger('tax_id');
+
+            $table->foreign('tax_id')->references('id')->on('taxes');
         });
     }
 

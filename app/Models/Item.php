@@ -10,6 +10,7 @@ class Item extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['description', 'price', 'tax_id'];
 
     public function tax(): BelongsTo
     {

@@ -16,7 +16,7 @@ class ItemSeeder extends Seeder
         DB::table('items')->insert([
             'description' => 'Martillo 10',
             'price' => 350.5,
-            'quantity' => 25.1
+            'tax_id' => 1
         ]);
     }
 }

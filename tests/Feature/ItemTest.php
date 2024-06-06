@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\DTO\ItemDto;
 use App\Models\Item;
 use App\Models\Tax;
 use App\Repositories\ItemRepository;
@@ -48,5 +49,26 @@ class ItemTest extends TestCase
         $item = $itemRepository->getitem($itemId);
 
         $this->assertNotNull($item);
+    }
+
+    public function test_that_can_create_item(){
+        $itemRepository = new ItemRepository();
+
+        $item = new ItemDto();
+        $item->description = 'Apple';
+        $item->price = 10.5;
+        $item->taxId = 1;
+
+        $response = $itemRepository->create($item);
+
+
+        $this->assertequals(200, $response['code']);
+    }
+
+    public function test_that_can_get_items(){
+        $itemRepository = new ItemRepository();
+        $items = $itemRepository->getitems();
+
+        $this->assertNotNull($items);
     }
 }
