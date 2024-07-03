@@ -5,6 +5,9 @@ namespace App\Repositories;
 use App\DTO\ItemDto;
 use App\Interfaces\iItemRepository;
 use App\Models\Item;
+use App\Models\Tax;
+use Illuminate\Support\Facades\DB;
+use mysql_xdevapi\Exception;
 
 class ItemRepository implements iItemRepository{
 
@@ -28,27 +31,36 @@ class ItemRepository implements iItemRepository{
     }
 
     public function getitem($id){
-        return Item::where('id', $id)->first();
+        try {
+         return Item::where('id', $id)->first();
+        }catch (\throwable $exception){
+            throw $exception;
+        }
     }
 
     /**
      * @throws \Throwable
      */
-    public function create(ItemDto $item): array {
+    public function create(ItemDto $item): Item {
 
         try {
-            Item::create([
+
+            if ( !isset($item->taxId) || empty($item->taxId)) $item->taxId = 3;
+            if ( !isset($item->price) || empty($item->price)) $item->price = 0;
+
+            $newItem = Item::create([
                 'description' => $item->description,
                 'price' => $item->price,
                 'tax_id' => $item->taxId,
             ]);
 
-            return [
+            return $newItem;
+            /*return [
                 'code' => 200,
                 'message' => 'Artículo creado satisfactoriamente.'
-            ];
+            ];*/
         }catch (\throwable $exception){
-            throw new $exception;
+            throw new Exception($exception->getMessage());
         }
 
     }

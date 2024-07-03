@@ -8,4 +8,5 @@ class ItemDto
     public string $description;
     public float $price;
     public int $taxId;
+    public float $quantity;
 }
