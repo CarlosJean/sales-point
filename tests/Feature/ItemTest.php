@@ -59,6 +59,14 @@ class ItemTest extends TestCase
         $item->price = 10.5;
         $item->taxId = 1;
 
+        //Creating taxes
+        Tax::factory()
+            ->count(2)
+            ->state(new Sequence(
+                ['rate' => 0],
+                ['rate' => 18],
+            ))->create();
+
         $response = $itemRepository->create($item);
 
 
