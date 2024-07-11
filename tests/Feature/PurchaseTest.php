@@ -3,39 +3,36 @@
 namespace Tests\Feature;
 
 use App\DTO\ItemDto;
+use App\DTO\PurchaseDetailDto;
+use App\Models\Item;
+use App\Models\PurchaseDetail;
+use App\Models\Supplier;
 use App\Models\Tax;
 use App\Repositories\ItemRepository;
 use App\Repositories\PurchaseRepository;
+use App\Repositories\SupplierRepository;
 use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class PurchaseTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
-    public function test_example(): void
-    {
-        $response = $this->get('/');
+    use RefreshDatabase;
 
-        $response->assertStatus(200);
-    }
+    /*public function setUp(): void{
+        Tax::factory()
+            ->count(2)
+            ->state(new Sequence(
+                ['rate' => 0],
+                ['rate' => 18],
+            ))->create();
 
-    public function test_that_purchase_can_be_created() {
-        $itemRepository = new ItemRepository();
-        $purchaseRepository = new PurchaseRepository($itemRepository);
+        Supplier::factory()
+            ->create();
+    }*/
+    public function test_that_can_purchase_an_existing_item() {
 
-        $firsItem = new ItemDto();
-        $firsItem->description = "Peras";
-        $firsItem->quantity = 3;
-
-        $secondItem = new ItemDto();
-        $secondItem->id = 2;
-        $secondItem->quantity = 3;
-
-        $items = array($firsItem, $secondItem);
-
-        //Creating taxes
+        //arrange
 
         Tax::factory()
             ->count(2)
@@ -44,7 +41,81 @@ class PurchaseTest extends TestCase
                 ['rate' => 18],
             ))->create();
 
-        $purchase = $purchaseRepository->create($items);
+        Item::factory()
+            ->count(2)
+            ->create();
+
+        Supplier::factory()
+                ->create();
+
+        $supplierRepository = new SupplierRepository();
+        $itemRepository = new ItemRepository();
+        $purchaseRepository = new PurchaseRepository($itemRepository, $supplierRepository);
+
+        $firstPurchaseDetail = new PurchaseDetailDto();
+        $firstPurchaseDetail->item = new ItemDto();
+        $firstPurchaseDetail->item->id = 1;
+        $firstPurchaseDetail->item->quantity = 2;
+
+        $secondPurchaseDetail = new PurchaseDetailDto();
+        $secondPurchaseDetail->item = new ItemDto();
+        $secondPurchaseDetail->item->id = 2;
+        $secondPurchaseDetail->item->quantity = 6;
+
+        $supplierId = 1;
+
+        $items = array($firstPurchaseDetail, $secondPurchaseDetail);
+
+        //Act
+        $purchaseRepository->create($supplierId, $items);
+
+        //Assert
+        $this->assertDatabaseCount('purchase_details', 2);
+    }
+    public function test_that_can_purchase_non_existing_items() {
+
+        //arrange
+        $tax = Tax::factory()
+            ->count(2)
+            ->state(new Sequence(
+                ['rate' => 0],
+                ['rate' => 18],
+            ))->create();
+
+        $supplier = Supplier::factory()
+                ->create();
+
+        $supplierRepository = new SupplierRepository();
+        $itemRepository = new ItemRepository();
+        $purchaseRepository = new PurchaseRepository($itemRepository, $supplierRepository);
+
+        $firstPurchaseDetail = new PurchaseDetailDto();
+        $firstPurchaseDetail->item = new ItemDto();
+        $firstItem = Item::factory()->make();
+
+        $firstPurchaseDetail->item->description = $firstItem->description;
+        $firstPurchaseDetail->item->quantity = 2;
+        $firstPurchaseDetail->item->price = $firstItem->price;
+        $firstPurchaseDetail->item->taxId = $tax[1]->id;
+
+        $secondPurchaseDetail = new PurchaseDetailDto();
+        $secondPurchaseDetail->item = new ItemDto();
+        $secondItem = Item::factory()->make();
+
+        $secondPurchaseDetail->item->description = $secondItem->description;
+        $secondPurchaseDetail->item->quantity = 2;
+        $secondPurchaseDetail->item->price = $secondItem->price;
+        $secondPurchaseDetail->item->taxId = $tax[1]->id;
+
+        $supplierId = $supplier->id;
+
+        $items = array($firstPurchaseDetail, $secondPurchaseDetail);
+
+        //Act
+        $purchaseInventory = $purchaseRepository->create($supplierId, $items);
+
+        //Assert
+        $this->assertDatabaseCount('purchase_details', 2);
     }
 
 }

@@ -6,9 +6,6 @@ use App\Models\Item;
 use App\Models\Tax;
 
 class PurchaseDetailDto {
-    public Item $item;
-    public float $quantity;
-    public Tax $tax;
-    public float $subtotal;
-    public float $price;
+    public ItemDto $item;
+    public float $tax;
 }

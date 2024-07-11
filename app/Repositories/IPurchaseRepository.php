@@ -3,5 +3,5 @@
 namespace App\Repositories;
 
 interface IPurchaseRepository {
-    public function create(array $itemDto);
+    public function create(int $supplierId, array $purchaseDetails);
 }

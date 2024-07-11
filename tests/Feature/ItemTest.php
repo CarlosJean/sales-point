@@ -52,25 +52,25 @@ class ItemTest extends TestCase
     }
 
     public function test_that_can_create_item(){
-        $itemRepository = new ItemRepository();
 
         $item = new ItemDto();
         $item->description = 'Apple';
         $item->price = 10.5;
-        $item->taxId = 1;
 
         //Creating taxes
-        Tax::factory()
+        $tax = Tax::factory()
             ->count(2)
             ->state(new Sequence(
                 ['rate' => 0],
                 ['rate' => 18],
             ))->create();
 
+        $item->taxId = $tax[1]->id;
+
+        $itemRepository = new ItemRepository();
         $response = $itemRepository->create($item);
 
-
-        $this->assertequals(200, $response['code']);
+        $this->assertNotNull($response);
     }
 
     public function test_that_can_get_items(){

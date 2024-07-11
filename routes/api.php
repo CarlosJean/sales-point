@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\PurchaseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
@@ -25,4 +26,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('v1')->group(function () {
     Route::get('items', [ItemController::class, 'index']);
     Route::post('items', [ItemController::class, 'store']);
+    Route::post('purchases', [PurchaseController::class, 'store']);
 });

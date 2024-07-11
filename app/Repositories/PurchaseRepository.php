@@ -3,50 +3,69 @@
 namespace App\Repositories;
 
 use App\DTO\ItemDto;
-use App\DTO\PurchaseDetailDto;
+use App\DTO\PurchaseInvoiceDto;
 use App\Interfaces\iItemRepository;
 use App\Models\Item;
 use App\Models\Purchase;
 use App\Models\PurchaseDetail;
+use App\Models\Supplier;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PurchaseRepository implements IPurchaseRepository {
 
-    public function __construct(iItemRepository $itemRepository) {
+    private iItemRepository $itemRepository;
+    private SupplierRepository $supplierRepository;
+
+    public function __construct(iItemRepository $itemRepository, SupplierRepository $supplierRepository) {
         $this->itemRepository = $itemRepository;
+        $this->supplierRepository = $supplierRepository;
     }
 
     /**
      * @throws \Exception
      */
-    public function create(array $itemDtos) {
+    public function create(int $supplierId, array $purchaseDetails): PurchaseInvoiceDto {
 
-        //Create a new purchase
-        $newPurchase = new Purchase();
-        $newPurchase->save();
+        try {
+            //Create a new purchase
+            $newPurchase = new Purchase();
 
-        foreach ($itemDtos as $itemDto) {
+            $supplier = $this->supplierRepository->getSupplierById($supplierId);
 
-            $purchaseDetailDto = new PurchaseDetailDto();
-            $purchaseDetailDto->item = $this->getPurchaseItem($itemDto);
-            $purchaseDetailDto->quantity = $itemDto->quantity;
-            $purchaseDetailDto->price = 0;//$itemDto->price;
-            //$purchaseDetailDto->tax = $itemDto->tax;
-            $purchaseDetailDto->subtotal = $purchaseDetailDto->quantity * $purchaseDetailDto->price;
+            $newPurchase->supplier_id = $supplier->id;
+            $newPurchase->save();
+
+            $purchaseInvoiceDetails = [];
+            foreach ($purchaseDetails as $purchaseDetail) {
+
+                $purchaseDetailModel = new PurchaseDetail();
+
+                $item = $this->getPurchaseItem($purchaseDetail->item);
+
+                $purchaseDetailModel->price = $item->price;
+                $purchaseDetailModel->quantity = $purchaseDetail->item->quantity;
+                $purchaseDetailModel->subtotal = $purchaseDetailModel->price * $purchaseDetailModel->quantity;
+
+                //Purchase detail tax set in order to return it on the purchase invoice.
+                $purchaseDetail->tax = $purchaseDetailModel->subtotal * $item->tax->rate / 100;
+
+                $purchaseDetailModel->tax = $purchaseDetail->tax;
+
+                $purchaseDetailModel->item()->associate($item);
+                $purchaseDetailModel->purchase()->associate($newPurchase);
+
+                $purchaseDetailModel->save();
+
+                $purchaseInvoiceDetails[] = $purchaseDetail;
+            }
 
 
-            $purchaseDetail = new PurchaseDetail();
+            return new PurchaseInvoiceDto($supplier, $purchaseInvoiceDetails);
 
-            $purchaseDetail->item()
-                ->associate($purchaseDetailDto->item);
-
-            $purchaseDetail->purchase()
-                ->associate($newPurchase);
-
-            $purchaseDetail->quantity = $purchaseDetailDto->quantity;
-
-            $purchaseDetail->save();
+        } catch (ModelNotFoundException $exception) {
+            throw new ModelNotFoundException($exception->getMessage());
         }
+
     }
 
     private function createItem($itemDto) {
@@ -57,7 +76,7 @@ class PurchaseRepository implements IPurchaseRepository {
         }
     }
 
-    private function getPurchaseItem(ItemDto $itemDto) : Item{
+    private function getPurchaseItem(ItemDto $itemDto): Item {
 
         $isNewItem = (!isset($itemDto->id) || $itemDto->id == null);
 
