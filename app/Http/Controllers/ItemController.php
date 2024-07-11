@@ -41,14 +41,28 @@ class ItemController extends Controller
      */
     public function store(ItemPostRequest $request) : JsonResponse {
 
-        $item = new ItemDto();
-        $item->description = $request->input('description');
-        $item->price = $request->input('price');
-        $item->taxId = $request->input('tax_id');
+        try {
+            $item = new ItemDto();
+            $item->description = $request->input('description');
+            $item->price = $request->input('price');
+            $item->taxId = $request->input('tax_id');
 
-        $response = $this->itemRepository->create($item);
+            $this->itemRepository->create($item);
 
-        return response()->json($response);
+            return response()->json([
+                'success' => true,
+                'code' => 200,
+                'message' => 'Item created successfully.'
+            ]);
+
+
+        }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'code' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
