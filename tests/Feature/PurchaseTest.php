@@ -19,21 +19,9 @@ class PurchaseTest extends TestCase
 {
     use RefreshDatabase;
 
-    /*public function setUp(): void{
-        Tax::factory()
-            ->count(2)
-            ->state(new Sequence(
-                ['rate' => 0],
-                ['rate' => 18],
-            ))->create();
-
-        Supplier::factory()
-            ->create();
-    }*/
     public function test_that_can_purchase_an_existing_item() {
 
         //arrange
-
         Tax::factory()
             ->count(2)
             ->state(new Sequence(
