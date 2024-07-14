@@ -4,8 +4,10 @@ namespace Tests\Feature;
 
 use App\DTO\ItemDto;
 use App\DTO\SaleDetailDto;
+use App\Models\Customer;
 use App\Models\Item;
 use App\Models\Tax;
+use App\Repositories\CustomerRepository;
 use App\Repositories\ItemRepository;
 use App\Repositories\SaleInvoiceRepository;
 use App\Repositories\SaleRepository;
@@ -29,6 +31,8 @@ class SaleTest extends TestCase {
 
     public function test_create_sale(): void {
 
+        $customer = Customer::factory()->create();
+
         $tax = Tax::factory()
             ->count(2)
             ->state(new Sequence(
@@ -42,8 +46,9 @@ class SaleTest extends TestCase {
 
         $itemRepository = new ItemRepository();
         $saleInvoiceRepository = new SaleInvoiceRepository($itemRepository);
+        $customerRepository = new CustomerRepository();
 
-        $saleRepository = new SaleRepository($itemRepository, $saleInvoiceRepository);
+        $saleRepository = new SaleRepository($itemRepository, $saleInvoiceRepository, $customerRepository);
 
         $item1 = new ItemDto();
         $item1->id = $item[0]->id;
@@ -61,6 +66,6 @@ class SaleTest extends TestCase {
 
         $saleDetails = [$saleDetail1, $saleDetail2];
 
-        $saleRepository->create($saleDetails);
+        $saleRepository->create($customer->id, $saleDetails);
     }
 }
