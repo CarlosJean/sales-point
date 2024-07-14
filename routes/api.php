@@ -2,6 +2,7 @@
 
 
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SaleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ItemController;
@@ -27,4 +28,5 @@ Route::prefix('v1')->group(function () {
     Route::get('items', [ItemController::class, 'index']);
     Route::post('items', [ItemController::class, 'store']);
     Route::post('purchases', [PurchaseController::class, 'store']);
+    Route::post('sales', [SaleController::class, 'store']);
 });
