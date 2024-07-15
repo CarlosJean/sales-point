@@ -33,14 +33,14 @@ class SaleTest extends TestCase {
 
         $customer = Customer::factory()->create();
 
-        $tax = Tax::factory()
+        Tax::factory()
             ->count(2)
             ->state(new Sequence(
                 ['rate' => 0],
                 ['rate' => 18],
             ))->create();
 
-        $item = Item::factory()
+        $items = Item::factory()
             ->count(2)
             ->create();
 
@@ -51,14 +51,14 @@ class SaleTest extends TestCase {
         $saleRepository = new SaleRepository($itemRepository, $saleInvoiceRepository, $customerRepository);
 
         $item1 = new ItemDto();
-        $item1->id = $item[0]->id;
+        $item1->id = $items[0]->id;
 
         $saleDetail1 = new SaleDetailDto();
         $saleDetail1->item = $item1;
         $saleDetail1->quantity = 3;
 
         $item2 = new ItemDto();
-        $item2->id = $item[1]->id;
+        $item2->id = $items[1]->id;
 
         $saleDetail2 = new SaleDetailDto();
         $saleDetail2->item = $item2;
@@ -66,6 +66,21 @@ class SaleTest extends TestCase {
 
         $saleDetails = [$saleDetail1, $saleDetail2];
 
-        $saleRepository->create($customer->id, $saleDetails);
+        $invoice = $saleRepository->create($customer->id, $saleDetails);
+
+        //Assert
+        $subtotal1 = $saleDetail1->quantity * $items[0]->price;
+        $subtotal2 = $saleDetail2->quantity * $items[1]->price;
+
+        $itemTax1 = $subtotal1 * $items[0]->tax->rate / 100;
+        $itemTax2 = $subtotal2 * $items[1]->tax->rate / 100;
+
+        $expectedSubtotal = $subtotal1 + $subtotal2;
+        $expectedTax = $itemTax1 + $itemTax2;
+        $expectedTotal = $expectedSubtotal + $expectedTax;
+
+        $this->assertEquals($expectedSubtotal, $invoice->subtotal);
+        $this->assertEquals($expectedTax, $invoice->tax);
+        $this->assertEquals($expectedTotal, $invoice->total);
     }
 }
