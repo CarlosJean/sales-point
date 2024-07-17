@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
 use Illuminate\Http\Request;
@@ -23,10 +24,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-
 Route::prefix('v1')->group(function () {
     Route::get('items', [ItemController::class, 'index']);
     Route::post('items', [ItemController::class, 'store']);
     Route::post('purchases', [PurchaseController::class, 'store']);
     Route::post('sales', [SaleController::class, 'store']);
+    Route::get('inventory', [InventoryController::class, 'index']);
+
+    //TODO: Create the endpoint for cash register.
+    //Route::post('cashflow/', [SaleController::class, 'store']);
 });

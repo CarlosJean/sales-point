@@ -10,6 +10,8 @@ use App\Interfaces\iItemRepository;
 use App\Models\Item;
 use App\Models\Sale;
 use App\Models\SaleDetail;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 class SaleRepository {
 
@@ -23,7 +25,7 @@ class SaleRepository {
         $this->customerRepository = $customerRepository;
     }
 
-    public function create(int $customerId, array $saleDetails) : SaleInvoiceDto{
+    public function create(int $customerId, array $saleDetails): SaleInvoiceDto {
 
         $sale = new Sale();
         $customer = $this->customerRepository->getCustomerById($customerId);
@@ -56,6 +58,19 @@ class SaleRepository {
         $saleInvoice->total = $this->saleInvoiceRepository->getSaleTotal($saleInvoice->details);
 
         return $saleInvoice;
+    }
+
+    public function getSales(): Builder {
+        return DB::table('sales')
+            ->join('sale_details', 'sale_details.sale_id', '=', 'sales.id')
+            ->rightJoin('items', 'sale_details.item_id', '=', 'items.id')
+            ->select(
+                'items.id as item_id',
+                'items.description as item',
+                DB::raw('IFNULL(SUM(sale_details.quantity), 0) as quantity'),
+                DB::raw("IFNULL(DATE_FORMAT(sales.created_at, '%d/%m/%Y'), DATE_FORMAT(CURRENT_DATE, '%d/%m/%Y')) as date")
+            )
+            ->groupBy('items.id', 'item', 'date');
     }
 
 }

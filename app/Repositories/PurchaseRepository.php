@@ -10,6 +10,9 @@ use App\Models\Purchase;
 use App\Models\PurchaseDetail;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseRepository implements IPurchaseRepository {
 
@@ -95,4 +98,19 @@ class PurchaseRepository implements IPurchaseRepository {
             throw new \Exception($exception->getMessage());
         }
     }
+
+    public function getPurchases(): Builder {
+
+        return DB::table('purchases')
+            ->join('purchase_details', 'purchase_details.purchase_id', '=', 'purchases.id')
+            ->rightJoin('items', 'purchase_details.item_id', '=', 'items.id')
+            ->select(
+                'items.id as item_id',
+                'items.description as item',
+                DB::raw('IFNULL(SUM(purchase_details.quantity), 0) as quantity'),
+                DB::raw("IFNULL(DATE_FORMAT(purchases.created_at, '%d/%m/%Y'), DATE_FORMAT(CURRENT_DATE, '%d/%m/%Y')) as date")
+            )
+            ->groupBy('items.id', 'item', 'date');
+    }
+
 }
