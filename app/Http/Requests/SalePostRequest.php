@@ -17,6 +17,7 @@ class SalePostRequest extends FormRequest {
         $this->purchaseRepository = $purchaseRepository;
         $this->saleRepository = $saleRepository;
         $this->inventoryRepository = $inventoryRepository;
+        parent::__construct();
     }
 
     /**
