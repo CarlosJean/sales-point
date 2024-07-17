@@ -45,9 +45,6 @@ class SaleController extends Controller {
             $saleDetails[] = $saleDetail;
         }
 
-       /* return response()->json([
-            'resultado' => $saleDetails
-        ]);*/
         $itemRepository = new ItemRepository();
         $saleInvoiceRepository = new SaleInvoiceRepository($itemRepository);
         $customerRepository = new CustomerRepository();
