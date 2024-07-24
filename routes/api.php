@@ -1,6 +1,7 @@
 <?php
 
 
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SaleController;
@@ -30,6 +31,7 @@ Route::prefix('v1')->group(function () {
     Route::post('purchases', [PurchaseController::class, 'store']);
     Route::post('sales', [SaleController::class, 'store']);
     Route::get('inventory', [InventoryController::class, 'index']);
+    Route::get('image/{type}/{file_name}', [ImageController::class, 'index']);
 
     //TODO: Create the endpoint for cash register.
     //Route::post('cashflow/', [SaleController::class, 'store']);
