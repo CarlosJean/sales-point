@@ -4,34 +4,31 @@ namespace App\Http\Controllers;
 
 use App\DTO\ItemDto;
 use App\Http\Requests\ItemPostRequest;
+use App\Http\Resources\ItemCollection;
+use App\Repositories\InventoryRepository;
 use App\Repositories\ItemRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
-class ItemController extends Controller
-{
+class ItemController extends Controller {
 
-
-    private ItemRepository $itemRepository;
-
-    public function __construct(ItemRepository $itemRepository) {
-        $this->itemRepository = $itemRepository;
+    public function __construct(InventoryRepository $inventoryRepository) {
+        $this->inventoryRepository = $inventoryRepository;
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $items = $this->itemRepository->getitems();
-        return response()->json($items);
+    public function index() {
+        $items = $this->inventoryRepository->getItemStock();
+        return new ItemCollection($items);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
+    public function create() {
         //
     }
 
@@ -39,7 +36,7 @@ class ItemController extends Controller
      * Store a newly created resource in storage.
      * @throws ValidationException
      */
-    public function store(ItemPostRequest $request) : JsonResponse {
+    public function store(ItemPostRequest $request): JsonResponse {
 
         try {
             $item = new ItemDto();
@@ -56,7 +53,7 @@ class ItemController extends Controller
             ]);
 
 
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'code' => 500,
@@ -68,32 +65,28 @@ class ItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
+    public function show(string $id) {
         //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
-    {
+    public function edit(string $id) {
         //
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
+    public function update(Request $request, string $id) {
         //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
+    public function destroy(string $id) {
         //
     }
 }

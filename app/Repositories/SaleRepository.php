@@ -67,10 +67,11 @@ class SaleRepository {
             ->select(
                 'items.id as item_id',
                 'items.description as item',
+                'items.price as item_price',
                 DB::raw('IFNULL(SUM(sale_details.quantity), 0) as quantity'),
                 DB::raw("IFNULL(DATE_FORMAT(sales.created_at, '%d/%m/%Y'), DATE_FORMAT(CURRENT_DATE, '%d/%m/%Y')) as date")
             )
-            ->groupBy('items.id', 'item', 'date');
+            ->groupBy('items.id', 'item', 'items.price', 'date');
     }
 
 }

@@ -71,7 +71,7 @@ class PurchaseRepository implements IPurchaseRepository {
 
     }
 
-    private function createItem($itemDto) {
+    private function createItem($itemDto) : Item{
         try {
             return $this->itemRepository->create($itemDto);
         } catch (\Exception $exception) {
@@ -107,10 +107,11 @@ class PurchaseRepository implements IPurchaseRepository {
             ->select(
                 'items.id as item_id',
                 'items.description as item',
+                'items.price as item_price',
                 DB::raw('IFNULL(SUM(purchase_details.quantity), 0) as quantity'),
                 DB::raw("IFNULL(DATE_FORMAT(purchases.created_at, '%d/%m/%Y'), DATE_FORMAT(CURRENT_DATE, '%d/%m/%Y')) as date")
             )
-            ->groupBy('items.id', 'item', 'date');
+            ->groupBy('items.id', 'item', 'items.price', 'date');
     }
 
 }

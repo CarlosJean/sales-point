@@ -22,6 +22,7 @@ class InventoryRepository {
 
         return DB::table(DB::raw("({$unionQuery->toSql()}) as subquery"))
             ->whereBetween('date', [$from, $to])
+            ->where('SUM(quantity)', '>', 0)
             ->select('item_id', 'item', DB::raw('SUM(quantity) as quantity'), 'date')
             ->groupBy('item_id', 'item', 'date')
             ->get();
