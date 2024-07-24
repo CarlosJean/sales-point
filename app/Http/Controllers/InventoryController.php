@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\InventoryCollection;
 use App\Repositories\InventoryRepository;
 use App\Repositories\PurchaseRepository;
 use App\Repositories\SaleRepository;
@@ -14,17 +15,20 @@ class InventoryController extends Controller
     public function __construct(PurchaseRepository $purchaseRepository, SaleRepository $saleRepository, InventoryRepository $inventoryRepository) {
         $this->purchaseRepository = $purchaseRepository;
         $this->saleRepository = $saleRepository;
+        $this->inventoryRepository = $inventoryRepository;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $inventoryRequest)
     {
-        $this->inventoryRepository = new InventoryRepository($this->purchaseRepository, $this->saleRepository);
-        $inventory = $this->inventoryRepository->getInventory();
+        $from = $inventoryRequest->input('from');
+        $to = $inventoryRequest->input('to');
 
-        return response()->json($inventory);
+        $inventory = $this->inventoryRepository->getInventory($from, $to);
+
+        return new InventoryCollection($inventory);
     }
 
     /**
