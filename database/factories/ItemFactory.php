@@ -20,6 +20,7 @@ class ItemFactory extends Factory
             'description' => $this->faker->word(),
             'price' => $this->faker->randomFloat(2,1,100000),
             'tax_id' => $this->faker->numberBetween(1,2),
+            'image' => '/img/items/' . $this->faker->randomElement(['1.jpg','2.jpg','3.jpg','4.jpg','5.jpg']),
         ];
     }
 }

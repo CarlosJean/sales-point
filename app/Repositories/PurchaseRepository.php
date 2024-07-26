@@ -108,10 +108,11 @@ class PurchaseRepository implements IPurchaseRepository {
                 'items.id as item_id',
                 'items.description as item',
                 'items.price as item_price',
+                'items.image as item_image',
                 DB::raw('IFNULL(SUM(purchase_details.quantity), 0) as quantity'),
                 DB::raw("IFNULL(DATE_FORMAT(purchases.created_at, '%d/%m/%Y'), DATE_FORMAT(CURRENT_DATE, '%d/%m/%Y')) as date")
             )
-            ->groupBy('items.id', 'item', 'items.price', 'date');
+            ->groupBy('items.id', 'item', 'items.price', 'date', 'items.image');
     }
 
 }

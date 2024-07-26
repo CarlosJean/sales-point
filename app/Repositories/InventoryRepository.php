@@ -23,7 +23,12 @@ class InventoryRepository {
         return DB::table(DB::raw("({$unionQuery->toSql()}) as subquery"))
             ->whereBetween('date', [$from, $to])
             ->where('SUM(quantity)', '>', 0)
-            ->select('item_id', 'item', DB::raw('SUM(quantity) as quantity'), 'date')
+            ->select(
+                'item_id',
+                'item',
+                DB::raw('SUM(quantity) as quantity'),
+                'date'
+            )
             ->groupBy('item_id', 'item', 'date')
             ->get();
     }
@@ -39,8 +44,14 @@ class InventoryRepository {
         $unionQuery = $this->purchaseAndSale();
 
         return DB::table(DB::raw("({$unionQuery->toSql()}) as subquery"))
-            ->select('item_id', 'item', 'item_price', DB::raw('SUM(quantity) as quantity'))
-            ->groupBy('item_id', 'item', 'item_price')
+            ->select(
+                'item_id',
+                'item',
+                'item_price',
+                DB::raw('SUM(quantity) as quantity'),
+                DB::raw( "CONCAT('". url('/') ."', item_image) as item_image"),
+            )
+            ->groupBy('item_id', 'item', 'item_price', 'item_image')
             ->get();
     }
 

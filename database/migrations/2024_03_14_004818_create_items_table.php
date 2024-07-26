@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('description');
             $table->decimal('price');
             $table->unsignedBigInteger('tax_id');
+            $table->string('image')->nullable();
 
             $table->foreign('tax_id')->references('id')->on('taxes');
         });
